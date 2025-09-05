@@ -74,11 +74,12 @@ function FindProxyForURL(url, host) {
     if (dnsDomainIs(host, "crehana.com")) return "PROXY 193.233.210.11:8080";
     if (dnsDomainIs(host, "cloud.microsoft")) return "PROXY 14.102.232.254:50100";
     if (dnsDomainIs(host, "creativefabrica.com")) return "PROXY 148.135.147.24:6534";
-    if (dnsDomainIs(host, "envato.com")) return "PROXY 45.170.253.85:50100";
+    if (dnsDomainIs(host, "envato.com")) return "PROXY 46.203.137.43:6040";
 
     // Por defecto todo directo
     return "DIRECT";
 }
+
 
 
 
