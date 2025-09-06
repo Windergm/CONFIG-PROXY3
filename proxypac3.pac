@@ -66,7 +66,7 @@ function FindProxyForURL(url, host) {
         "crehana.com": "PROXY 193.233.210.11:8080; DIRECT",
         "cloud.microsoft": "PROXY 14.102.232.254:50100; DIRECT",
         "creativefabrica.com": "PROXY 148.135.147.24:6534; DIRECT",
-        "envato.com": "PROXY 200.10.35.100:50100; DIRECT"
+        "envato.com": "PROXY 45.170.253.51:50100; DIRECT"
     };
     for (var domain in staticProxies) {
         if (dnsDomainIs(host, domain) || host == domain) {
@@ -75,9 +75,4 @@ function FindProxyForURL(url, host) {
     }
     return "DIRECT";
 }
-
-
-
-
-
-
+3
