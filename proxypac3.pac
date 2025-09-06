@@ -1,84 +1,81 @@
 function FindProxyForURL(url, host) {
+    url = url.toLowerCase();
     host = host.toLowerCase();
 
-    // Cache simple de resultados DNS y evaluaciones frecuentes
-    var isLocalhost = (host === "localhost" || host === "127.0.0.1");
-    var isInPrivateNet = false;
-    var hostIP = null;
-
-    // Comprobar si el host es IPv4 o resolver IP
-    var isIpV4Addr = /^(\d+\.){3}\d+$/;
-    if (isIpV4Addr.test(host)) {
-        hostIP = host;
-    } else {
-        hostIP = dnsResolve(host);
+    // Exclusión masiva para servicios críticos, correo, sync y buscadores
+    if (
+        shExpMatch(host, "*.mozilla.org") ||
+        shExpMatch(host, "*.microsoft.com") ||
+        shExpMatch(host, "*.windows.com") ||
+        shExpMatch(host, "*.live.com") ||
+        shExpMatch(host, "*.update.microsoft.com") ||
+        shExpMatch(host, "*.firefoxusercontent.com") ||
+        shExpMatch(host, "*.google.com") ||
+        shExpMatch(host, "*.gmail.com") ||
+        shExpMatch(host, "*.duckduckgo.com") ||
+        shExpMatch(host, "*.icloud.com") ||
+        shExpMatch(host, "*.apple.com") ||
+        shExpMatch(host, "*.msn.com") ||
+        shExpMatch(host, "*.outlook.com")
+    ) {
+        return "DIRECT";
     }
 
-    // Redes privadas típicas: Clase A, B, C
-    if (hostIP !== null) {
-        if (shExpMatch(hostIP, "10.*") || shExpMatch(hostIP, "172.16.*") || shExpMatch(hostIP, "172.17.*") ||
-            shExpMatch(hostIP, "172.18.*") || shExpMatch(hostIP, "172.19.*") || shExpMatch(hostIP, "172.20.*") ||
-            shExpMatch(hostIP, "172.21.*") || shExpMatch(hostIP, "172.22.*") || shExpMatch(hostIP, "172.23.*") ||
-            shExpMatch(hostIP, "172.24.*") || shExpMatch(hostIP, "172.25.*") || shExpMatch(hostIP, "172.26.*") ||
-            shExpMatch(hostIP, "172.27.*") || shExpMatch(hostIP, "172.28.*") || shExpMatch(hostIP, "172.29.*") ||
-            shExpMatch(hostIP, "172.30.*") || shExpMatch(hostIP, "172.31.*") ||
-            shExpMatch(hostIP, "192.168.*")) {
-            isInPrivateNet = true;
+    // Exclusión para descarga, multimedia y CDN
+    if (url.match(/\.(zip|rar|7z|tar|gz|iso|exe|msi|mp4|mkv|avi|mov|mp3|flac|wav|pdf)(\?|$)/)) {
+        return "DIRECT";
+    }
+    if (host.match(/^(cdn\.|media\.|img\.|static\.|assets\.|videos\.|images\.|photos\.)/)) {
+        return "DIRECT";
+    }
+    if (isPlainHostName(host) ||
+        shExpMatch(host, "localhost") ||
+        shExpMatch(host, "127.*") ||
+        shExpMatch(host, "10.*") ||
+        shExpMatch(host, "172.16.*") ||
+        shExpMatch(host, "172.17.*") ||
+        shExpMatch(host, "172.18.*") ||
+        shExpMatch(host, "172.19.*") ||
+        shExpMatch(host, "172.20.*") ||
+        shExpMatch(host, "172.21.*") ||
+        shExpMatch(host, "172.22.*") ||
+        shExpMatch(host, "172.23.*") ||
+        shExpMatch(host, "172.24.*") ||
+        shExpMatch(host, "172.25.*") ||
+        shExpMatch(host, "172.26.*") ||
+        shExpMatch(host, "172.27.*") ||
+        shExpMatch(host, "172.28.*") ||
+        shExpMatch(host, "172.29.*") ||
+        shExpMatch(host, "172.30.*") ||
+        shExpMatch(host, "172.31.*") ||
+        shExpMatch(host, "192.168.*") ||
+        shExpMatch(host, "169.254.*")
+    ) {
+        return "DIRECT";
+    }
+
+    // PROXY solo para dominios específicos manual
+    var staticProxies = {
+        "adobe.com": "PROXY 102.129.178.6:4414; DIRECT",
+        "perplexity.ai": "PROXY 96.62.127.25:50100; DIRECT",
+        "chatgpt.com": "PROXY 91.132.124.97:8080; DIRECT",
+        "freepik.com": "PROXY 45.170.253.85:50100; DIRECT",
+        "freepik.es": "PROXY 45.170.253.85:50100; DIRECT",
+        "canva.com": "PROXY 93.177.95.214:8080; DIRECT",
+        "platzi.com": "PROXY 14.102.232.254:50100; DIRECT",
+        "crehana.com": "PROXY 193.233.210.11:8080; DIRECT",
+        "cloud.microsoft": "PROXY 14.102.232.254:50100; DIRECT",
+        "creativefabrica.com": "PROXY 148.135.147.24:6534; DIRECT",
+        "envato.com": "PROXY 200.10.35.100:50100; DIRECT"
+    };
+    for (var domain in staticProxies) {
+        if (dnsDomainIs(host, domain) || host == domain) {
+            return staticProxies[domain];
         }
     }
-
-    if (isLocalhost || isInPrivateNet) {
-        return "DIRECT";
-    }
-
-    // Evitar proxy para recursos estáticos comunes
-    if (shExpMatch(url, "*.css") || shExpMatch(url, "*.js") ||
-        shExpMatch(url, "*.woff") || shExpMatch(url, "*.woff2") ||
-        shExpMatch(url, "*.ttf") || shExpMatch(url, "*.eot")) {
-        return "DIRECT";
-    }
-
-    // CDN de medios
-    if (shExpMatch(host, "cdn.*") || shExpMatch(host, "media.*") || shExpMatch(host, "img.*")) {
-        return "DIRECT";
-    }
-
-    // Archivos grandes y medios
-    if (shExpMatch(url, "*.zip") || shExpMatch(url, "*.rar") || shExpMatch(url, "*.7z") ||
-        shExpMatch(url, "*.tar") || shExpMatch(url, "*.gz") || shExpMatch(url, "*.iso") ||
-        shExpMatch(url, "*.exe") || shExpMatch(url, "*.msi") ||
-
-        shExpMatch(url, "*.mp4") || shExpMatch(url, "*.mkv") || shExpMatch(url, "*.avi") ||
-        shExpMatch(url, "*.mov") || shExpMatch(url, "*.webm") || shExpMatch(url, "*.flv") ||
-        shExpMatch(url, "*.m4v") ||
-
-        shExpMatch(url, "*.mp3") || shExpMatch(url, "*.flac") || shExpMatch(url, "*.wav") ||
-        shExpMatch(url, "*.aac") || shExpMatch(url, "*.ogg") || shExpMatch(url, "*.m4a") ||
-
-        shExpMatch(url, "*.jpg") || shExpMatch(url, "*.jpeg") || shExpMatch(url, "*.png") ||
-        shExpMatch(url, "*.gif") || shExpMatch(url, "*.bmp") || shExpMatch(url, "*.svg") ||
-        shExpMatch(url, "*.webp") || shExpMatch(url, "*.ico") ||
-
-        shExpMatch(url, "*.pdf") || shExpMatch(url, "*.epub")) {
-        return "DIRECT";
-    }
-
-    // Reglas específicas por dominio
-    if (dnsDomainIs(host, "adobe.com")) return "PROXY 102.129.178.6:4414";
-    if (dnsDomainIs(host, "perplexity.ai") || dnsDomainIs(host, "artlist.io")) return "PROXY 96.62.127.25:50100";
-    if (dnsDomainIs(host, "chatgpt.com")) return "PROXY 91.132.124.97:8080";
-    if (dnsDomainIs(host, "freepik.com") || dnsDomainIs(host, "freepik.es")) return "PROXY 46.203.137.43:6040";
-    if (dnsDomainIs(host, "placeit.net")) return "PROXY 161.123.54.112:5496";
-    if (dnsDomainIs(host, "canva.com")) return "PROXY 93.177.95.214:8080";
-    if (dnsDomainIs(host, "platzi.com")) return "PROXY 14.102.232.254:50100";
-    if (dnsDomainIs(host, "crehana.com")) return "PROXY 193.233.210.11:8080";
-    if (dnsDomainIs(host, "cloud.microsoft")) return "PROXY 14.102.232.254:50100";
-    if (dnsDomainIs(host, "creativefabrica.com")) return "PROXY 148.135.147.24:6534";
-    if (dnsDomainIs(host, "envato.com")) return "PROXY 46.203.137.43:6040";
-
-    // Por defecto todo directo
     return "DIRECT";
 }
+
 
 
 
