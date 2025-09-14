@@ -30,6 +30,7 @@ function FindProxyForURL(url, host) {
         "crehana.com": "PROXY 193.233.210.11:8080; DIRECT",
         "cloud.microsoft": "PROXY 45.170.253.85:50100; DIRECT",
         "creativefabrica.com": "PROXY 148.135.147.24:6534; DIRECT",
+         "nordvpn.com": "PROXY 148.135.147.24:6534; DIRECT",
         "envato.com": "PROXY 45.170.253.51:50100; DIRECT"
     };
 
@@ -65,3 +66,4 @@ function FindProxyForURL(url, host) {
     // Conexión directa por defecto
     return "DIRECT";
 }
+
