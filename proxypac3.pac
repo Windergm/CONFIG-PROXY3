@@ -67,5 +67,6 @@ function FindProxyForURL(url, host) {
     }
 
     // Si no está en la lista y no es descarga ni excepción, falla la conexión con proxy inválido
-    return "PROXY 0.0.0.0:0";
+       return "DIRECT";
 }
+
