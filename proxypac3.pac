@@ -59,3 +59,4 @@ function FindProxyForURL(url, host) {
     // Si no está en la lista y no es excepción ni descarga, falla la conexión con proxy inválido
     return "PROXY 0.0.0.0:0";
 }
+
