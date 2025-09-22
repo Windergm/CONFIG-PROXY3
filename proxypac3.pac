@@ -2,7 +2,6 @@ function FindProxyForURL(url, host) {
     url = url.toLowerCase();
     host = host.toLowerCase();
 
-    // Excepciones para Firefox y servicios internos
     var firefoxBypass = [
         "accounts.firefox.com",
         "sync.services.mozilla.com",
@@ -17,7 +16,6 @@ function FindProxyForURL(url, host) {
         }
     }
 
-    // Acceso directo a redes privadas/localhost
     if (
         isPlainHostName(host) ||
         shExpMatch(host, "localhost") ||
@@ -31,12 +29,10 @@ function FindProxyForURL(url, host) {
         return "DIRECT";
     }
 
-    // Acceso directo para descargas de archivos grandes o multimedia
     if (url.match(/\.(zip|rar|7z|tar|gz|iso|exe|msi|mp4|mkv|avi|mov|mp3|flac|wav|pdf)(\?|$)/)) {
         return "DIRECT";
     }
 
-    // Proxies específicos para dominios permitidos
     var staticProxies = {
         "adobe.com": "PROXY 102.129.178.6:4414",
         "perplexity.ai": "PROXY 96.62.127.25:50100",
@@ -56,6 +52,6 @@ function FindProxyForURL(url, host) {
         }
     }
 
-    // Si no cumple ninguna condición, NO devuelve nada (= bloqueado)
-    // No hay return extra aquí.
+    // Bloquear todo lo demás
+    return "PROXY 0.0.0.0:0";
 }
