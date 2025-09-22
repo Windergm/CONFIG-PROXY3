@@ -36,6 +36,16 @@ function FindProxyForURL(url, host) {
         return "DIRECT";
     }
 
+    // Permitir descargas DIRECT desde subdominios de Envato (evita errores de conexión)
+    if (
+        dnsDomainIs(host, "envatousercontent.com") ||
+        shExpMatch(host, "*.envatousercontent.com") ||
+        shExpMatch(host, "elements.envatousercontent.com") ||
+        shExpMatch(host, "downloads.elements.envatousercontent.com")
+    ) {
+        return "DIRECT";
+    }
+
     // Para estos dominios estrictamente usar su proxy asignado, si no funciona hay error
     var staticProxies = {
         "adobe.com": "PROXY 102.129.178.6:4414",
@@ -56,7 +66,6 @@ function FindProxyForURL(url, host) {
         }
     }
 
-    // Si no está en la lista y no es excepción ni descarga, falla la conexión con proxy inválido
+    // Si no está en la lista y no es descarga ni excepción, falla la conexión con proxy inválido
     return "PROXY 0.0.0.0:0";
 }
-
