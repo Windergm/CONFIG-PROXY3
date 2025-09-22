@@ -2,7 +2,7 @@ function FindProxyForURL(url, host) {
     url = url.toLowerCase();
     host = host.toLowerCase();
 
-    // 1. Siempre DIRECT para dominios esenciales de Firefox y otros internos
+    // Excepciones para Firefox y servicios internos
     var firefoxBypass = [
         "accounts.firefox.com",
         "sync.services.mozilla.com",
@@ -17,7 +17,7 @@ function FindProxyForURL(url, host) {
         }
     }
 
-    // 2. Siempre DIRECT para redes locales e IPs privadas
+    // Acceso directo a redes privadas/localhost
     if (
         isPlainHostName(host) ||
         shExpMatch(host, "localhost") ||
@@ -31,15 +31,15 @@ function FindProxyForURL(url, host) {
         return "DIRECT";
     }
 
-    // 3. DIRECT solo para descargas de archivos grandes/multimedia
+    // Acceso directo para descargas de archivos grandes o multimedia
     if (url.match(/\.(zip|rar|7z|tar|gz|iso|exe|msi|mp4|mkv|avi|mov|mp3|flac|wav|pdf)(\?|$)/)) {
         return "DIRECT";
     }
 
-    // 4. Proxy específico para dominios concretos
+    // Proxies específicos para dominios permitidos
     var staticProxies = {
         "adobe.com": "PROXY 102.129.178.6:4414",
-        "perplexity.ai": "PROXY 96.62.127.25:50100", 
+        "perplexity.ai": "PROXY 96.62.127.25:50100",
         "chatgpt.com": "PROXY 91.132.124.97:8080",
         "freepik.com": "PROXY 45.170.253.85:50100",
         "freepik.es": "PROXY 45.170.253.85:50100",
@@ -56,6 +56,6 @@ function FindProxyForURL(url, host) {
         }
     }
 
-    // 5. TODO el resto, usar SIEMPRE tu proxy principal (ej. por default)
-    return "PROXY 45.170.253.51:50100";
+    // Si no cumple ninguna condición, NO devuelve nada (= bloqueado)
+    // No hay return extra aquí.
 }
